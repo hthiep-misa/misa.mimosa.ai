@@ -54,26 +54,32 @@ class EmbeddingService:
             logger.error(f"Failed to load embedding model: {e}")
             raise
     
-    def get_collection_name(self, product_code: str) -> str:
+    def get_collection_name(self, product_code: str, tenant_id: str) -> str:
         """
-        Generate collection name based on product code
+        Generate collection name based on product code and tenant ID
         
         Args:
             product_code: Product code identifier
+            tenant_id: Tenant identifier
             
         Returns:
-            str: Collection name
+            str: Collection name in format [product_code]_[tenant_id]
         """
-        return f"product_{product_code.lower().replace(' ', '_')}"
+        # Clean product_code and tenant_id
+        clean_product = product_code.lower().replace(' ', '_').replace('-', '_')
+        clean_tenant = tenant_id.lower().replace(' ', '_').replace('-', '_')
+        return f"{clean_product}_{clean_tenant}"
     
-    def ensure_collection_exists(self, product_code: str, vector_size: int = 1024):
+    def ensure_collection_exists(self, product_code: str, tenant_id: str, vector_size: int = 1024):
         """
         Ensure collection exists, create if not
         
         Args:
             product_code: Product code for collection
+            tenant_id: Tenant identifier
+            vector_size: Size of embedding vectors
         """
-        collection_name = self.get_collection_name(product_code)
+        collection_name = self.get_collection_name(product_code, tenant_id)
         
         try:
             collections = self.client.get_collections().collections
@@ -140,8 +146,8 @@ class EmbeddingService:
         """
         try:
             # Ensure collection exists
-            self.ensure_collection_exists(product_code)
-            collection_name = self.get_collection_name(product_code)
+            self.ensure_collection_exists(product_code, tenant_id)
+            collection_name = self.get_collection_name(product_code, tenant_id)
             
             # Extract text to embed (accounting_object_name)
             text_to_embed = data.get("accounting_object_name", "")
