@@ -1,0 +1,27 @@
+{
+  "_comment": "Custom abbreviations mapping. Add your domain-specific abbreviations here.",
+  "_format": "{ 'abbreviation': 'full form' }",
+  
+  "bv": "bệnh viện",
+  "ks": "khách sạn",
+  "vp": "văn phòng",
+  "ch": "cửa hàng",
+  "pk": "phòng khám",
+  "ttyt": "trung tâm y tế",
+  "cskh": "chăm sóc khách hàng",
+  "kd": "kinh doanh",
+  "hc": "hành chính",
+  "tc": "tài chính",
+  "kt": "kế toán",
+  "ns": "nhân sự",
+  "it": "công nghệ thông tin",
+  "qc": "quảng cáo",
+  "mk": "marketing",
+  "r&d": "nghiên cứu và phát triển",
+  "ceo": "giám đốc điều hành",
+  "cfo": "giám đốc tài chính",
+  "cto": "giám đốc công nghệ",
+  "hr": "nhân sự",
+  "pr": "quan hệ công chúng"
+}
+

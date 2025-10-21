@@ -1,0 +1,19 @@
+{
+  "_comment": "Custom synonyms for query expansion. Add your domain-specific terms here.",
+  "_format": "{ 'word': ['synonym1', 'synonym2', ...] }",
+  
+  "bệnh viện": ["bv", "phòng khám", "y tế", "hospital"],
+  "trường học": ["trường", "học viện", "đại học", "school"],
+  "khách sạn": ["ks", "hotel", "resort", "nhà nghỉ"],
+  "nhà hàng": ["quán ăn", "restaurant", "ăn uống"],
+  "siêu thị": ["chợ", "cửa hàng", "supermarket", "mart"],
+  "văn phòng": ["vp", "office", "trụ sở"],
+  "nhà máy": ["xưởng", "factory", "plant", "cơ sở sản xuất"],
+  "kho": ["kho bãi", "warehouse", "depot"],
+  "cửa hàng": ["ch", "shop", "store"],
+  "phòng": ["room", "department"],
+  "ban": ["board", "committee"],
+  "sở": ["department", "bureau"],
+  "cục": ["bureau", "administration"]
+}
+
