@@ -13,3 +13,4 @@ transformers==4.47.1
 # Data validation
 pydantic==2.10.4
 pydantic-settings==2.7.1
+einops==0.8.1

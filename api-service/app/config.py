@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     KAFKA_TOPIC: str = "embedding-requests"
     
     # Embedding Settings
-    EMBEDDING_MODEL: str = "keepitreal/vietnamese-sbert"
+    # Using Jina Embeddings v3 - excellent multilingual model
+    EMBEDDING_MODEL: str = "jinaai/jina-embeddings-v3"
+    EMBEDDING_TASK: str = "retrieval.passage"  # Task type for documents (not used in API, but for consistency)
+    EMBEDDING_DIMENSIONS: int = 1024  # Jina v3 dimensions
     
     # Search Enhancement Settings
     CUSTOM_SYNONYMS_FILE: Optional[str] = None  # Path to custom synonyms JSON file

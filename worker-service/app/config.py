@@ -19,8 +19,10 @@ class Settings(BaseSettings):
     KAFKA_AUTO_OFFSET_RESET: str = "earliest"
     
     # Embedding Settings
-    EMBEDDING_MODEL: str = "keepitreal/vietnamese-sbert"
-    VECTOR_SIZE: int = 768  # Size for Vietnamese-SBERT model (PhoBERT-based)
+    # Using Jina Embeddings v3 - excellent multilingual model
+    EMBEDDING_MODEL: str = "jinaai/jina-embeddings-v3"
+    EMBEDDING_TASK: str = "retrieval.passage"  # Task type for documents
+    VECTOR_SIZE: int = 1024  # Jina v3 dimensions
     
     # Processing Settings
     BATCH_SIZE: int = 100

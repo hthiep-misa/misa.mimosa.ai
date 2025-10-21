@@ -52,7 +52,11 @@ class QdrantService:
     def _load_encoder(self):
         """Load sentence transformer model"""
         try:
-            self.encoder = SentenceTransformer(settings.EMBEDDING_MODEL)
+            # For Jina v3, need trust_remote_code=True
+            self.encoder = SentenceTransformer(
+                settings.EMBEDDING_MODEL,
+                trust_remote_code=True
+            )
             logger.info(f"Loaded embedding model: {settings.EMBEDDING_MODEL}")
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
@@ -70,7 +74,7 @@ class QdrantService:
         """
         return f"product_{product_code.lower().replace(' ', '_')}"
     
-    def ensure_collection_exists(self, product_code: str, vector_size: int = 768):
+    def ensure_collection_exists(self, product_code: str, vector_size: int = 1024):
         """
         Ensure collection exists, create if not
         
@@ -99,36 +103,46 @@ class QdrantService:
             logger.error(f"Error ensuring collection exists: {e}")
             raise
     
-    def encode_text(self, text: str, normalize: bool = True) -> List[float]:
+    def encode_text(self, text: str, task: str = "retrieval.query", normalize: bool = True) -> List[float]:
         """
         Encode text to embedding vector with caching
         
         Args:
             text: Text to encode
+            task: Task type for Jina v3 (retrieval.query or retrieval.passage)
             normalize: L2 normalize the embedding (recommended)
             
         Returns:
             List[float]: Embedding vector
         """
         try:
+            # Create cache key with task
+            cache_key = f"{task}:{text}"
+            
             # Try cache first
             if _cache_service:
-                cached = _cache_service.get_embedding(text)
+                cached = _cache_service.get_embedding(cache_key)
                 if cached is not None:
                     return cached
             
-            # Encode if not cached
-            embedding = self.encoder.encode(text, convert_to_tensor=False, normalize_embeddings=normalize)
+            # Encode with task-specific prompt for Jina v3
+            embedding = self.encoder.encode(
+                text,
+                task=task,
+                convert_to_tensor=False,
+                normalize_embeddings=normalize
+            )
+            
             embedding_list = embedding.tolist()
             
             # Cache the result
             if _cache_service:
-                _cache_service.set_embedding(text, embedding_list)
+                _cache_service.set_embedding(cache_key, embedding_list)
             
             return embedding_list
             
         except Exception as e:
-            logger.error(f"Error encoding text: {e}")
+            logger.error(f"Error encoding text with task '{task}': {e}")
             raise
     
     def search(
@@ -184,8 +198,8 @@ class QdrantService:
             # Normalize query
             normalized_query = TextProcessor.normalize_text(query)
             
-            # Encode query with normalization
-            query_vector = self.encode_text(normalized_query, normalize=True)
+            # Encode query with task="retrieval.query" for Jina v3
+            query_vector = self.encode_text(normalized_query, task="retrieval.query", normalize=True)
             
             # Create filter for tenant_id
             search_filter = Filter(

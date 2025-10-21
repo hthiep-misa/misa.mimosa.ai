@@ -44,7 +44,11 @@ class EmbeddingService:
     def _load_encoder(self):
         """Load sentence transformer model"""
         try:
-            self.encoder = SentenceTransformer(settings.EMBEDDING_MODEL)
+            # For Jina v3, need trust_remote_code=True
+            self.encoder = SentenceTransformer(
+                settings.EMBEDDING_MODEL,
+                trust_remote_code=True
+            )
             logger.info(f"Loaded embedding model: {settings.EMBEDDING_MODEL}")
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
@@ -62,7 +66,7 @@ class EmbeddingService:
         """
         return f"product_{product_code.lower().replace(' ', '_')}"
     
-    def ensure_collection_exists(self, product_code: str):
+    def ensure_collection_exists(self, product_code: str, vector_size: int = 1024):
         """
         Ensure collection exists, create if not
         
@@ -79,33 +83,40 @@ class EmbeddingService:
                 self.client.create_collection(
                     collection_name=collection_name,
                     vectors_config=VectorParams(
-                        size=settings.VECTOR_SIZE,
+                        size=vector_size,
                         distance=Distance.COSINE
                     )
                 )
-                logger.info(f"Created collection: {collection_name}")
+                logger.info(f"Created collection: {collection_name} with vector size {vector_size}")
             else:
                 logger.debug(f"Collection already exists: {collection_name}")
         except Exception as e:
             logger.error(f"Error ensuring collection exists: {e}")
             raise
     
-    def encode_text(self, text: str, normalize: bool = True) -> List[float]:
+    def encode_text(self, text: str, task: str = "retrieval.passage", normalize: bool = True) -> List[float]:
         """
         Encode text to embedding vector
         
         Args:
             text: Text to encode
+            task: Task type for Jina v3 (retrieval.passage for documents)
             normalize: L2 normalize the embedding (recommended)
             
         Returns:
             List[float]: Embedding vector
         """
         try:
-            embedding = self.encoder.encode(text, convert_to_tensor=False, normalize_embeddings=normalize)
+            # Encode with task-specific prompt for Jina v3
+            embedding = self.encoder.encode(
+                text,
+                task=task,
+                convert_to_tensor=False,
+                normalize_embeddings=normalize
+            )
             return embedding.tolist()
         except Exception as e:
-            logger.error(f"Error encoding text: {e}")
+            logger.error(f"Error encoding text with task '{task}': {e}")
             raise
     
     def process_and_store(
