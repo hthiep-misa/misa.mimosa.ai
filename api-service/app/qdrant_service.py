@@ -5,6 +5,7 @@ from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, Fi
 from sentence_transformers import SentenceTransformer
 from app.config import settings
 from app.text_processor import TextProcessor, SearchEnhancer
+from app.model_loader import load_model_smart
 
 logger = logging.getLogger(__name__)
 
@@ -50,16 +51,13 @@ class QdrantService:
             raise
     
     def _load_encoder(self):
-        """Load sentence transformer model"""
+        """Load embedding model with automatic caching"""
         try:
-            # For Jina v3, need trust_remote_code=True
-            self.encoder = SentenceTransformer(
-                settings.EMBEDDING_MODEL,
-                trust_remote_code=True
-            )
-            logger.info(f"Loaded embedding model: {settings.EMBEDDING_MODEL}")
+            logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL}")
+            self.encoder = load_model_smart(settings.EMBEDDING_MODEL)
+            logger.info(f"✅ Embedding model loaded successfully")
         except Exception as e:
-            logger.error(f"Failed to load embedding model: {e}")
+            logger.error(f"❌ Failed to load embedding model: {e}")
             raise
     
     def get_collection_name(self, product_code: str, tenant_id: str) -> str:

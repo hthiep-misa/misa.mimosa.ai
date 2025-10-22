@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     
     # Embedding Settings
     # Using Jina Embeddings v3 - excellent multilingual model
+    # Can be either HuggingFace model name or local path (e.g., "./models/jina-embeddings-v3")
     EMBEDDING_MODEL: str = "jinaai/jina-embeddings-v3"
     EMBEDDING_TASK: str = "retrieval.passage"  # Task type for documents (not used in API, but for consistency)
     EMBEDDING_DIMENSIONS: int = 1024  # Jina v3 dimensions
